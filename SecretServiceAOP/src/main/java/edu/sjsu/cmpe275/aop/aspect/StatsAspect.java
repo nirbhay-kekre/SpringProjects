@@ -17,29 +17,29 @@ import edu.sjsu.cmpe275.aop.Secret;
 @Aspect
 @Order(1)
 public class StatsAspect {
-	
+
 	// Recourses for longest secret length.
 	private int longestSecretLength = 0;
 
-	//Recourses for most trusted user.
+	// Recourses for most trusted user.
 	private Map<String, Set<String>> targetUserToUniqueSharerSecretMap = new HashMap<String, Set<String>>();
 	private String mostTrustedUser = null;
 	private int mostTrustedUserCount = 0;
 
-	//Recourses for best known secret stat.
+	// Recourses for best known secret stat.
 	private Map<UUID, Set<String>> secretReadByUserMap = new HashMap<UUID, Set<String>>();
 	private String bestKnownSecret = null;
 	private int bestKnowSecretCount = 0;
 	private Map<UUID, String> secretOwnerMap = new HashMap<UUID, String>();
 
-	//Recourses for worst secret keeper stat.
+	// Recourses for worst secret keeper stat.
 	private Map<String, Set<String>> sharedWithUserUniqueSecretMap = new HashMap<String, Set<String>>();
 	private Map<String, Set<String>> sharedByUserUniqueSecretMap = new HashMap<String, Set<String>>();
 
 	@AfterReturning("execution(public * edu.sjsu.cmpe275.aop.SecretService.createSecret(..))")
 	public void createSecretAdvice(JoinPoint joinPoint) {
 		String secretContent = (String) joinPoint.getArgs()[1];
-		if (secretContent.length() > longestSecretLength) {
+		if (secretContent != null && secretContent.length() > longestSecretLength) {
 			longestSecretLength = secretContent.length();
 		}
 	}
@@ -133,8 +133,12 @@ public class StatsAspect {
 		if (bestKnowSecretCount < readers.size()) {
 			bestKnowSecretCount = readers.size();
 			bestKnownSecret = secretContent.getContent();
-		} else if (bestKnowSecretCount == readers.size() && secretContent.getContent().compareTo(bestKnownSecret) < 0) {
-			bestKnownSecret = secretContent.getContent();
+		} else if (bestKnowSecretCount == readers.size()) {
+			if (secretContent.getContent() == null || bestKnownSecret == null) {
+				bestKnownSecret = null;
+			} else if (secretContent.getContent().compareTo(bestKnownSecret) < 0) {
+				bestKnownSecret = secretContent.getContent();
+			}
 		}
 	}
 
@@ -161,10 +165,10 @@ public class StatsAspect {
 			int sharedWithUserCount = sharedWithUser == null ? 0 : sharedWithUser.size();
 			int sharedByUserCount = sharedByUser == null ? 0 : sharedByUser.size();
 			int currentUserScore = sharedWithUserCount - sharedByUserCount;
-			if(currentUserScore < worstSecretKeeperScore) {
+			if (currentUserScore < worstSecretKeeperScore) {
 				worstSecretKeeperScore = currentUserScore;
 				worstSecretKeeper = user;
-			}else if(currentUserScore == worstSecretKeeperScore && worstSecretKeeper.compareTo(user)>0) {
+			} else if (currentUserScore == worstSecretKeeperScore && worstSecretKeeper.compareTo(user) > 0) {
 				worstSecretKeeper = user;
 			}
 		}

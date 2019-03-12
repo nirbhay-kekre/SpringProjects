@@ -1,6 +1,5 @@
 package edu.sjsu.cmpe275.aop.aspect;
 
-import java.lang.reflect.Field;
 import java.util.HashMap;
 import java.util.HashSet;
 import java.util.Map;
@@ -14,7 +13,6 @@ import org.aspectj.lang.annotation.Before;
 import org.springframework.core.annotation.Order;
 
 import edu.sjsu.cmpe275.aop.NotAuthorizedException;
-import edu.sjsu.cmpe275.aop.Secret;
 import edu.sjsu.cmpe275.aop.SecretServiceImpl;
 
 @Aspect
@@ -48,10 +46,11 @@ public class AccessControlAspect {
 		 *  2. Trying to share a secret which is not shared with him.
 		 *  3. If there does not exist a secret with the given UUID.
 		 */
-		if(userId.equals(targetUserId)) {
-			return;
-		}else if ((isSecretOwnedByUser(userId, secretId) || isSecretSharedWithUser(userId, secretId))) {
+		if ((isSecretOwnedByUser(userId, secretId) || isSecretSharedWithUser(userId, secretId))) {
 			Set<UUID> sharedSecrets = userSharedSecretMap.get(targetUserId);
+			if(userId.equals(targetUserId)) {
+				return;
+			}
 			if (sharedSecrets == null) {
 				sharedSecrets = new HashSet<UUID>();
 				userSharedSecretMap.put(targetUserId, sharedSecrets);
@@ -73,10 +72,11 @@ public class AccessControlAspect {
 		 * 	1.  If the user with userId has not created the given secret.
 		 * 	2. 	If there does not exist a secret with the given UUID.
 		 */
-		if(userId.equals(targetUserId)) {
-			return;
-		}
+		
 		if (isSecretOwnedByUser(userId, secretId)) {
+			if(userId.equals(targetUserId)) {
+				return;
+			}
 			Set<UUID> sharedSecrets = userSharedSecretMap.get(targetUserId);
 			if (sharedSecrets != null) {
 				sharedSecrets.remove(secretId);

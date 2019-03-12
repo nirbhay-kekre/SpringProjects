@@ -14,12 +14,12 @@ public class ValidationAspect {
 		System.out.printf("Doing validation prior to the executuion of the metohd %s\n", joinPoint.getSignature().getName());
 		Object[] arguments = joinPoint.getArgs();
 		String userId = (String) arguments[0] ,secretContent= (String) arguments[1];
-		if(userId == null || secretContent.length() >100) {
+		if(userId == null || (secretContent != null && secretContent.length() >100)) {
 			throw new IllegalArgumentException();
 		}
 	}
 	
-	@Before("execution(public * edu.sjsu.cmpe275.aop.SecretService.*(..)) ")
+	@Before("execution(public * edu.sjsu.cmpe275.aop.SecretService.readSecret(..)) || execution(public * edu.sjsu.cmpe275.aop.SecretService.shareSecret(..)) || execution(public * edu.sjsu.cmpe275.aop.SecretService.unshareSecret(..))")
 	public void secretNullInputValidationAdvice(JoinPoint joinPoint) {
 		System.out.printf("Doing validation prior to the executuion of the metohd %s\n", joinPoint.getSignature().getName());
 		Object[] arguments = joinPoint.getArgs();

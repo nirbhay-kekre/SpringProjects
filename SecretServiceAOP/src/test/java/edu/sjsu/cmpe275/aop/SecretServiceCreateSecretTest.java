@@ -71,6 +71,19 @@ public class SecretServiceCreateSecretTest extends BaseTestClass {
 		secretService.createSecret(null,
 				"01234567890123456789012345678901234567890123456789012345678901234567890123456789012345678901234567890123456789");
 	}
+
+	/**
+	 * Validation Test
+	 * 4. SecretContent null is allowed
+	 * 
+	 * @throws IllegalArgumentException
+	 * @throws IOException
+	 */
+	@Test
+	public void createSecretValidationNullSecretContentTest() throws IllegalArgumentException, IOException {
+		UUID id1  = secretService.createSecret("123", null);
+		assertNotNull(id1);
+	}
 	
 	/**
 	 * Network Failure Test

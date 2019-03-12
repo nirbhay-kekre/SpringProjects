@@ -446,7 +446,14 @@ public class SecretStatsTest extends BaseTestClass{
 		assertEquals("Carl", secretStats.getWorstSecretKeeper());
 		
 		//A: 0-2 = -2, B: 1-1 = 0, C=2-5 = -3, D = 1-0 = 1,  E = 1-0 = 1 ,  F = 1-0 = 1,  G = 1, H = 1
-		secretService.unshareSecret("Carl", secretId1, "Carl");
+		boolean flag = false;
+		try{
+			secretService.unshareSecret("Carl", secretId1, "Carl");
+		}catch (NotAuthorizedException e) {
+			flag = true;
+		}
+		assertTrue(flag);
+		
 		assertEquals("Carl", secretStats.getWorstSecretKeeper());
 		
 		//A: 0-2 = -2, B: 1-1 = 0, C=2-5 = -3, D = 1-0 = 1,  E = 1-0 = 1 ,  F = 1-0 = 1,  G = 1, H = 1
